@@ -7,3 +7,4 @@ flask
 gunicorn
 dash-bootstrap-components
 python-dotenv
+openai
