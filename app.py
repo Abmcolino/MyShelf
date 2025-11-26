@@ -21,73 +21,17 @@ app = dash.Dash(
 )
 server = app.server
 
-
 # ---------------------------------------------------------
 # ⭐ LAYOUT PRINCIPAL
 # ---------------------------------------------------------
+# Layout base: home_layout como fallback para Render
 app.layout = dbc.Container([
-
-
-    # MENÚ SUPERIOR: SOLO "INICIO"
-    dbc.Row(
-        dbc.Col(
-            dbc.Nav(
-                [
-                    dbc.NavItem(
-                        dbc.NavLink(
-                            "Inicio",
-                            href="/",
-                            active="exact",
-                            className="px-3 py-1",
-                            style={
-                                "fontSize": "0.9rem",
-                                "backgroundColor": "#ffffff",
-                                "borderRadius": "12px",
-                                "boxShadow": "0 2px 5px rgba(0,0,0,0.1)",
-                                "display": "inline-block",
-                                "width": "120px",
-                                "textAlign": "center"
-                            }
-                        )
-                    )
-                ],
-                pills=False,
-                justified=False,
-                className="mb-2",
-                style={"display": "flex", "justifyContent": "center"}
-            )
-        )
-    ),
-
-    # MENÚ INFERIOR
-    dbc.Row(
-        dbc.Col(
-            dbc.Nav(
-                [
-                    dbc.NavItem(dbc.NavLink("Explorador", href="/explore", active="exact")),
-                    dbc.NavItem(dbc.NavLink("Recomendador", href="/recommend", active="exact")),
-                    dbc.NavItem(dbc.NavLink("Editar Base de Datos", href="/edit", active="exact")),
-                    dbc.NavItem(dbc.NavLink("Lecturas", href="/readings", active="exact")),
-                    dbc.NavItem(dbc.NavLink("Añadir libros", href="/add-books", active="exact")),
-                    dbc.NavItem(dbc.NavLink("Reseñas", href="/resenas", active="exact")),  # SIN ACENTO
-                ],
-                pills=True,
-                justified=True,
-                className='mb-4 shadow-sm rounded-pill custom-nav'
-            ),
-            width=12
-        )
-    ),
-
-    # CONTENIDO DE LA PÁGINA
     dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content', style={'minHeight': '600px'})
-
-], fluid=True, style={'backgroundColor':'#f4f1e0', 'fontFamily':'Georgia, serif', 'color':'#3b2f2f'})
-
+    html.Div(id='page-content', children=home_layout())
+], fluid=True)
 
 # ---------------------------------------------------------
-# CALLBACK: CAMBIO DE PÁGINAS (con captura de errores y traceback visual)
+# CALLBACK: CAMBIO DE PÁGINAS
 # ---------------------------------------------------------
 @app.callback(
     dash.Output('page-content', 'children'),
@@ -105,13 +49,11 @@ def display_page(pathname):
             return recommend_layout()
         elif pathname == "/add-books":
             return add_books_layout()
-        elif pathname == "/resenas":  # SIN ACENTO
+        elif pathname == "/resenas":
             return reseñas_layout()
         else:
             return home_layout()
-
     except Exception as e:
-        # Si algo falla al renderizar una página, devolvemos un panel con el traceback
         tb = traceback.format_exc()
         return dbc.Container([
             dbc.Alert("Se ha producido un error al cargar la página. Aquí tienes el traceback:", color="danger"),
@@ -120,32 +62,18 @@ def display_page(pathname):
             html.P("Comprueba la consola donde ejecutas python para ver la traza completa.")
         ], className='mt-3')
 
-
-# ---------------------------------------------------------
-# LOGO → HOME
-# ---------------------------------------------------------
-@app.callback(
-    dash.Output('url', 'pathname'),
-    dash.Input('logo-btn', 'n_clicks'),
-    prevent_initial_call=True
-)
-def go_home(n):
-    return "/"
-
-
 # ---------------------------------------------------------
 # REGISTRO DE CALLBACKS
 # ---------------------------------------------------------
-# Registra todos los callbacks de cada página
 register_edit_callbacks(app)
 register_readings_callbacks(app)
 register_recommend_callbacks(app)
 register_add_books_callbacks(app)
 register_reseñas_callbacks(app)
-register_explore_callbacks(app)  # debe coincidir con la definición en src/pages/explore.py
+register_explore_callbacks(app)
 
 # ---------------------------------------------------------
-# EJECUCIÓN
+# EJECUCIÓN LOCAL (solo para desarrollo)
 # ---------------------------------------------------------
 if __name__ == "__main__":
-    app.run(debug=True, port=8050)
+    app.run(debug=True)
