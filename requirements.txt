@@ -1,0 +1,9 @@
+dash>=2.10
+pandas
+plotly
+scikit-learn
+joblib
+flask
+gunicorn
+dash-bootstrap-components
+python-dotenv
