@@ -21,26 +21,12 @@ app = dash.Dash(
 )
 server = app.server
 
-LOGO_PATH = "myshelf/logo.png"
 
 # ---------------------------------------------------------
 # ⭐ LAYOUT PRINCIPAL
 # ---------------------------------------------------------
 app.layout = dbc.Container([
 
-    # LOGO CENTRADO
-    dbc.Row(
-        dbc.Col(
-            html.Img(
-                src=LOGO_PATH,
-                style={'max-height': '80px', 'cursor': 'pointer'},
-                id='logo-btn'
-            ),
-            width='auto'
-        ),
-        justify='center',
-        className='my-3'
-    ),
 
     # MENÚ SUPERIOR: SOLO "INICIO"
     dbc.Row(
