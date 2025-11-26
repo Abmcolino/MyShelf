@@ -3,6 +3,7 @@ import dash
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 import traceback
+import os
 
 # Importar layouts y callbacks de cada página
 from src.pages.edit import edit_form_layout, register_edit_callbacks
@@ -22,16 +23,51 @@ app = dash.Dash(
 server = app.server
 
 # ---------------------------------------------------------
-# ⭐ LAYOUT PRINCIPAL
+# Layout principal con menú
 # ---------------------------------------------------------
-# Layout base: home_layout como fallback para Render
 app.layout = dbc.Container([
+    # URL
     dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content', children=home_layout())
-], fluid=True)
+
+    # Menú superior
+    dbc.Row(
+        dbc.Col(
+            dbc.Nav(
+                [dbc.NavItem(dbc.NavLink("Inicio", href="/", active="exact"))],
+                pills=False,
+                justified=False,
+                className="mb-2",
+                style={"display": "flex", "justifyContent": "center"}
+            )
+        )
+    ),
+
+    # Menú inferior
+    dbc.Row(
+        dbc.Col(
+            dbc.Nav(
+                [
+                    dbc.NavItem(dbc.NavLink("Explorador", href="/explore", active="exact")),
+                    dbc.NavItem(dbc.NavLink("Recomendador", href="/recommend", active="exact")),
+                    dbc.NavItem(dbc.NavLink("Editar Base de Datos", href="/edit", active="exact")),
+                    dbc.NavItem(dbc.NavLink("Lecturas", href="/readings", active="exact")),
+                    dbc.NavItem(dbc.NavLink("Añadir libros", href="/add-books", active="exact")),
+                    dbc.NavItem(dbc.NavLink("Reseñas", href="/resenas", active="exact")),
+                ],
+                pills=True,
+                justified=True,
+                className='mb-4 shadow-sm rounded-pill custom-nav'
+            ),
+            width=12
+        )
+    ),
+
+    # Contenido dinámico
+    html.Div(id='page-content', style={'minHeight': '600px'})
+], fluid=True, style={'backgroundColor':'#f4f1e0', 'fontFamily':'Georgia, serif', 'color':'#3b2f2f'})
 
 # ---------------------------------------------------------
-# CALLBACK: CAMBIO DE PÁGINAS
+# Callback de navegación de páginas
 # ---------------------------------------------------------
 @app.callback(
     dash.Output('page-content', 'children'),
@@ -53,17 +89,15 @@ def display_page(pathname):
             return reseñas_layout()
         else:
             return home_layout()
-    except Exception as e:
+    except Exception:
         tb = traceback.format_exc()
         return dbc.Container([
-            dbc.Alert("Se ha producido un error al cargar la página. Aquí tienes el traceback:", color="danger"),
-            html.Pre(tb, style={'whiteSpace':'pre-wrap', 'overflowX':'auto', 'maxHeight':'400px'}),
-            html.Hr(),
-            html.P("Comprueba la consola donde ejecutas python para ver la traza completa.")
+            dbc.Alert("Se ha producido un error al cargar la página.", color="danger"),
+            html.Pre(tb, style={'whiteSpace':'pre-wrap', 'overflowX':'auto', 'maxHeight':'400px'})
         ], className='mt-3')
 
 # ---------------------------------------------------------
-# REGISTRO DE CALLBACKS
+# Registro de callbacks de cada página
 # ---------------------------------------------------------
 register_edit_callbacks(app)
 register_readings_callbacks(app)
@@ -73,7 +107,8 @@ register_reseñas_callbacks(app)
 register_explore_callbacks(app)
 
 # ---------------------------------------------------------
-# EJECUCIÓN LOCAL (solo para desarrollo)
+# Ejecución local
 # ---------------------------------------------------------
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8050))
+    app.run(debug=True, host="0.0.0.0", port=port)
