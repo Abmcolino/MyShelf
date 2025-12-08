@@ -195,4 +195,4 @@ def register_readings_callbacks(app):
         df_auth.columns = ["Author", "Count"]
         fig_authors = px.bar(df_auth.head(10), x="Author", y="Count", title='Top autores más leídos')
 
-        return fig_year, fig_cat, fig_time, fig_authorsrn children
+        return fig_year, fig_cat, fig_time, fig_authorsrn 
